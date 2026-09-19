@@ -1,0 +1,1435 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Wordle</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;700&family=Roboto+Slab:wght@700&display=swap" rel="stylesheet">
+
+<style>
+
+/* =========================================================
+   BASIC RESET
+========================================================= */
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+html,
+body{
+    width:100%;
+    height:100%;
+}
+
+body{
+    font-family:'Libre Franklin',sans-serif;
+    background:#000;
+    color:#fff;
+    overflow:hidden;
+}
+
+
+/* =========================================================
+   LANDING PAGE
+========================================================= */
+
+#landing{
+    position:fixed;
+    inset:0;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    background:#000;
+    color:#fff;
+
+    padding:20px;
+}
+
+.hero{
+    text-align:center;
+    width:100%;
+    max-width:520px;
+}
+
+
+/* LOGO */
+
+.logo{
+    width:115px;
+    margin:0 auto 20px;
+}
+
+.logo-grid{
+    display:grid;
+    grid-template-columns:repeat(3,32px);
+    gap:4px;
+
+    background:#fff;
+    padding:6px;
+    border-radius:12px;
+
+    width:max-content;
+    margin:auto;
+}
+
+.logo-grid div{
+    width:32px;
+    height:32px;
+    background:#000;
+}
+
+.logo-grid .yellow{
+    background:#c9b458;
+}
+
+.logo-grid .green{
+    background:#6aaa64;
+}
+
+
+/* TITLE */
+
+.hero h1{
+    font-family:'Roboto Slab',serif;
+
+    font-size:clamp(52px,7vw,78px);
+
+    margin-bottom:20px;
+
+    color:#fff;
+}
+
+
+/* DESCRIPTION */
+
+.hero p{
+    font-size:clamp(24px,4vw,36px);
+
+    line-height:1.25;
+
+    margin-bottom:40px;
+
+    color:#fff;
+}
+
+
+/* BUTTONS */
+
+.buttons{
+    display:flex;
+
+    gap:18px;
+
+    justify-content:center;
+
+    margin-bottom:40px;
+}
+
+.btn{
+    padding:16px 38px;
+
+    border-radius:40px;
+
+    font-size:20px;
+
+    font-weight:700;
+
+    cursor:pointer;
+
+    border:2px solid #fff;
+
+    background:#000;
+
+    color:#fff;
+
+    transition:transform .2s;
+}
+
+.btn:hover{
+    transform:scale(1.04);
+}
+
+.play{
+    background:#fff;
+    color:#000;
+}
+
+
+/* DATE */
+
+.date{
+    font-size:18px;
+
+    font-weight:700;
+
+    margin-bottom:8px;
+
+    color:#fff;
+}
+
+.puzzle{
+    font-size:18px;
+
+    color:#fff;
+}
+
+
+/* =========================================================
+   GAME
+========================================================= */
+
+#game{
+
+    display:none;
+
+    width:100%;
+
+    height:100dvh;
+
+    min-height:100vh;
+
+    background:#121213;
+
+    color:white;
+
+    flex-direction:column;
+
+    align-items:center;
+
+    overflow:hidden;
+}
+
+
+/* HEADER */
+
+header{
+
+    width:100%;
+
+    padding:8px;
+
+    text-align:center;
+
+    font-size:27px;
+
+    font-family:'Roboto Slab',serif;
+
+    border-bottom:1px solid #3a3a3c;
+
+    letter-spacing:2px;
+
+    flex-shrink:0;
+}
+
+
+/* =========================================================
+   BOARD
+========================================================= */
+
+#board{
+
+    margin:12px auto;
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(6,50px);
+
+    gap:5px;
+
+    flex-shrink:0;
+}
+
+.tile{
+
+    width:50px;
+
+    height:50px;
+
+    border:2px solid #3a3a3c;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    font-size:1.55rem;
+
+    font-weight:bold;
+
+    text-transform:uppercase;
+
+    color:white;
+}
+
+
+/* FLIP ANIMATION */
+
+.flip{
+    animation:flip .45s ease forwards;
+}
+
+@keyframes flip{
+
+    50%{
+        transform:rotateX(90deg);
+    }
+
+    100%{
+        transform:rotateX(0);
+    }
+
+}
+
+
+/* TILE COLORS */
+
+.correct{
+    background:#538d4e;
+    border-color:#538d4e;
+}
+
+.present{
+    background:#b59f3b;
+    border-color:#b59f3b;
+}
+
+.absent{
+    background:#3a3a3c;
+    border-color:#3a3a3c;
+}
+
+
+/* =========================================================
+   KEYBOARD
+========================================================= */
+
+#keyboard{
+
+    margin-top:auto;
+
+    margin-bottom:10px;
+
+    width:100%;
+
+    padding:0 8px;
+
+    flex-shrink:0;
+}
+
+.row{
+
+    display:flex;
+
+    justify-content:center;
+
+    margin:2px 0;
+
+    width:100%;
+}
+
+.key{
+
+    background:#818384;
+
+    color:white;
+
+    border:none;
+
+    margin:2px;
+
+    padding:0;
+
+    border-radius:4px;
+
+    font-weight:bold;
+
+    cursor:pointer;
+
+    min-width:34px;
+
+    width:40px;
+
+    height:42px;
+
+    font-size:12px;
+
+    touch-action:manipulation;
+}
+
+.wide{
+
+    width:58px;
+
+    padding:0;
+
+    font-size:10px;
+}
+
+
+/* =========================================================
+   PROPOSAL PAGE
+========================================================= */
+
+#proposal{
+
+    position:fixed;
+
+    inset:0;
+
+    background:#000;
+
+    color:white;
+
+    display:none;
+
+    justify-content:center;
+
+    align-items:center;
+
+    padding:20px;
+
+    text-align:center;
+}
+
+.card{
+
+    text-align:center;
+
+    width:100%;
+
+    max-width:650px;
+}
+
+.card h2{
+
+    font-family:'Roboto Slab',serif;
+
+    font-size:clamp(34px,6vw,54px);
+
+    margin-bottom:18px;
+
+    color:white;
+}
+
+.card p{
+
+    font-size:clamp(18px,3vw,22px);
+
+    margin-bottom:40px;
+
+    color:white;
+}
+
+.answerBtns{
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    gap:20px;
+
+    position:relative;
+}
+
+.answerBtns button{
+
+    padding:16px 34px;
+
+    font-size:20px;
+
+    border-radius:40px;
+
+    border:none;
+
+    cursor:pointer;
+
+    font-weight:bold;
+
+    touch-action:manipulation;
+}
+
+#yes{
+
+    background:white;
+
+    color:black;
+}
+
+#no{
+
+    background:#333;
+
+    color:white;
+
+    position:relative;
+}
+
+#accepted{
+
+    display:none;
+
+    margin-top:30px;
+
+    font-size:clamp(18px,4vw,24px);
+
+    font-weight:bold;
+
+    color:white;
+}
+
+
+/* =========================================================
+   DESKTOP / LAPTOP
+   Compact so the whole game fits on screen
+========================================================= */
+
+@media (min-width:701px){
+
+    #game header{
+
+        padding:8px;
+
+        font-size:27px;
+    }
+
+    #board{
+
+        margin:12px auto;
+
+        grid-template-columns:
+            repeat(6,50px);
+
+        gap:5px;
+    }
+
+    .tile{
+
+        width:50px;
+
+        height:50px;
+
+        font-size:1.55rem;
+    }
+
+    #keyboard{
+
+        margin-bottom:10px;
+    }
+
+    .row{
+
+        margin:2px 0;
+    }
+
+    .key{
+
+        width:40px;
+
+        height:42px;
+
+        margin:2px;
+
+        font-size:12px;
+    }
+
+    .wide{
+
+        width:58px;
+
+        font-size:10px;
+    }
+
+}
+
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media (max-width:700px){
+
+    .logo{
+
+        transform:scale(.9);
+
+        margin-bottom:10px;
+    }
+
+    .hero h1{
+
+        margin-bottom:15px;
+    }
+
+    .hero p{
+
+        margin-bottom:30px;
+    }
+
+    .buttons{
+
+        margin-bottom:30px;
+    }
+
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width:480px){
+
+    #landing{
+
+        padding:20px 15px;
+    }
+
+
+    /* LANDING */
+
+    .logo{
+
+        transform:scale(.75);
+
+        margin-top:-5px;
+
+        margin-bottom:0;
+    }
+
+    .hero h1{
+
+        font-size:52px;
+
+        margin-bottom:14px;
+    }
+
+    .hero p{
+
+        font-size:25px;
+
+        line-height:1.25;
+
+        margin-bottom:32px;
+    }
+
+
+    /* BUTTONS */
+
+    .buttons{
+
+        gap:12px;
+
+        margin-bottom:30px;
+    }
+
+    .btn{
+
+        padding:14px 28px;
+
+        font-size:17px;
+    }
+
+    .date{
+
+        font-size:15px;
+    }
+
+    .puzzle{
+
+        font-size:15px;
+    }
+
+
+    /* GAME HEADER */
+
+    #game header{
+
+        padding:10px;
+
+        font-size:27px;
+    }
+
+
+    /* BOARD */
+
+    #board{
+
+        margin:16px auto;
+
+        gap:5px;
+
+        grid-template-columns:
+            repeat(
+                6,
+                min(56px,calc((100vw - 42px)/6))
+            );
+    }
+
+    .tile{
+
+        width:
+            min(56px,calc((100vw - 42px)/6));
+
+        height:
+            min(56px,calc((100vw - 42px)/6));
+
+        font-size:1.65rem;
+    }
+
+
+    /* KEYBOARD */
+
+    #keyboard{
+
+        margin-bottom:10px;
+
+        padding:0 2px;
+    }
+
+    .row{
+
+        margin:3px 0;
+    }
+
+    .key{
+
+        width:9vw;
+
+        min-width:0;
+
+        height:47px;
+
+        margin:2px;
+
+        font-size:12px;
+    }
+
+    .wide{
+
+        width:15vw;
+
+        font-size:10px;
+    }
+
+
+    /* PROPOSAL */
+
+    #proposal{
+
+        padding:25px 20px;
+    }
+
+    .card h2{
+
+        font-size:36px;
+
+        line-height:1.15;
+
+        margin-bottom:15px;
+    }
+
+    .card p{
+
+        font-size:18px;
+
+        margin-bottom:30px;
+    }
+
+    .answerBtns{
+
+        gap:12px;
+    }
+
+    .answerBtns button{
+
+        padding:14px 28px;
+
+        font-size:18px;
+    }
+
+    #accepted{
+
+        font-size:19px;
+
+        line-height:1.4;
+    }
+
+}
+
+
+/* =========================================================
+   VERY SMALL PHONES
+========================================================= */
+
+@media (max-width:360px){
+
+    .hero h1{
+
+        font-size:46px;
+    }
+
+    .hero p{
+
+        font-size:22px;
+    }
+
+    .btn{
+
+        padding:12px 23px;
+
+        font-size:16px;
+    }
+
+
+    #board{
+
+        gap:4px;
+
+        grid-template-columns:
+            repeat(
+                6,
+                min(50px,calc((100vw - 34px)/6))
+            );
+    }
+
+    .tile{
+
+        width:
+            min(50px,calc((100vw - 34px)/6));
+
+        height:
+            min(50px,calc((100vw - 34px)/6));
+
+        font-size:1.4rem;
+    }
+
+
+    .key{
+
+        height:43px;
+
+        font-size:11px;
+    }
+
+}
+
+
+/* =========================================================
+   LANDSCAPE PHONE
+========================================================= */
+
+@media (max-height:500px) and (orientation:landscape){
+
+    #game header{
+
+        padding:5px;
+
+        font-size:22px;
+    }
+
+    #board{
+
+        margin:5px auto;
+
+        grid-template-columns:
+            repeat(6,42px);
+
+        gap:3px;
+    }
+
+    .tile{
+
+        width:42px;
+
+        height:42px;
+
+        font-size:1.3rem;
+    }
+
+    #keyboard{
+
+        margin-bottom:3px;
+    }
+
+    .row{
+
+        margin:1px 0;
+    }
+
+    .key{
+
+        height:32px;
+
+        width:35px;
+
+        font-size:10px;
+    }
+
+    .wide{
+
+        width:50px;
+    }
+
+}
+
+
+/* =========================================================
+   PREVENT TEXT SELECTION
+========================================================= */
+
+#game,
+#keyboard,
+.tile{
+
+    user-select:none;
+
+    -webkit-user-select:none;
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<!-- ======================================================
+     LANDING PAGE
+====================================================== -->
+
+<div id="landing">
+
+    <div class="hero">
+
+        <div class="logo">
+
+            <div class="logo-grid">
+
+                <div></div>
+                <div></div>
+                <div></div>
+
+                <div></div>
+                <div class="yellow"></div>
+                <div class="green"></div>
+
+                <div class="green"></div>
+                <div class="green"></div>
+                <div class="green"></div>
+
+            </div>
+
+        </div>
+
+
+        <h1>Wordle</h1>
+
+
+        <p>
+            Get 6 chances to guess<br>
+            a 6-letter word.
+        </p>
+
+
+        <div class="buttons">
+
+            <button class="btn">
+                Log in
+            </button>
+
+            <button
+                class="btn play"
+                onclick="startGame()"
+            >
+                Play
+            </button>
+
+        </div>
+
+
+        <div class="date">
+            September 19, 2026
+        </div>
+
+        <div class="puzzle">
+            No. 1918
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- ======================================================
+     GAME
+====================================================== -->
+
+<div id="game">
+
+    <header>
+        WORDLE
+    </header>
+
+    <div id="board"></div>
+
+    <div id="keyboard"></div>
+
+</div>
+
+
+
+<!-- ======================================================
+     PROPOSAL
+====================================================== -->
+
+<div id="proposal">
+
+    <div class="card">
+
+        <h2>
+            Will you date me?
+        </h2>
+
+        <p>
+            You solved today's Wordle.
+        </p>
+
+
+        <div class="answerBtns">
+
+            <button id="yes">
+                Yes
+            </button>
+
+            <button id="no">
+                No
+            </button>
+
+        </div>
+
+
+        <div id="accepted">
+            I'm really happy you said yes.
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<script>
+
+/* =========================================================
+   GAME VARIABLES
+========================================================= */
+
+const ANSWER = "DATEME";
+
+const ROWS = 6;
+
+const COLS = 6;
+
+let row = 0;
+
+let col = 0;
+
+
+const board = Array.from(
+    {length:ROWS},
+    () => Array(COLS).fill("")
+);
+
+
+const boardEl =
+    document.getElementById("board");
+
+
+/* =========================================================
+   CREATE BOARD
+========================================================= */
+
+for(let r=0; r<ROWS; r++){
+
+    for(let c=0; c<COLS; c++){
+
+        const tile =
+            document.createElement("div");
+
+        tile.className = "tile";
+
+        tile.id = `${r}-${c}`;
+
+        boardEl.appendChild(tile);
+
+    }
+
+}
+
+
+/* =========================================================
+   START GAME
+========================================================= */
+
+function startGame(){
+
+    document.getElementById("landing")
+        .style.display = "none";
+
+    document.getElementById("game")
+        .style.display = "flex";
+
+}
+
+
+/* =========================================================
+   KEYBOARD LAYOUT
+========================================================= */
+
+const layout = [
+
+    ["Q","W","E","R","T","Y","U","I","O","P"],
+
+    ["A","S","D","F","G","H","J","K","L"],
+
+    ["ENTER","Z","X","C","V","B","N","M","⌫"]
+
+];
+
+
+const kb =
+    document.getElementById("keyboard");
+
+
+layout.forEach(r => {
+
+    const div =
+        document.createElement("div");
+
+    div.className = "row";
+
+
+    r.forEach(k => {
+
+        const b =
+            document.createElement("button");
+
+        b.className = "key";
+
+
+        if(k === "ENTER" || k === "⌫"){
+
+            b.classList.add("wide");
+
+        }
+
+
+        b.textContent = k;
+
+
+        b.onclick = () => press(k);
+
+
+        div.appendChild(b);
+
+    });
+
+
+    kb.appendChild(div);
+
+});
+
+
+/* =========================================================
+   PHYSICAL KEYBOARD
+========================================================= */
+
+document.addEventListener("keydown", e => {
+
+    if(
+        document.getElementById("game")
+        .style.display !== "flex"
+    ){
+        return;
+    }
+
+
+    if(e.key === "Enter"){
+
+        press("ENTER");
+
+    }
+
+    else if(e.key === "Backspace"){
+
+        press("⌫");
+
+    }
+
+    else if(/^[a-zA-Z]$/.test(e.key)){
+
+        press(e.key.toUpperCase());
+
+    }
+
+});
+
+
+/* =========================================================
+   KEY PRESS
+========================================================= */
+
+function press(k){
+
+    if(row >= ROWS){
+        return;
+    }
+
+
+    /* BACKSPACE */
+
+    if(k === "⌫"){
+
+        if(col > 0){
+
+            col--;
+
+            board[row][col] = "";
+
+
+            document.getElementById(
+                `${row}-${col}`
+            ).textContent = "";
+
+        }
+
+    }
+
+
+    /* ENTER */
+
+    else if(k === "ENTER"){
+
+        if(col === COLS){
+
+            checkGuess();
+
+        }
+
+    }
+
+
+    /* LETTER */
+
+    else{
+
+        if(col < COLS){
+
+            board[row][col] = k;
+
+
+            document.getElementById(
+                `${row}-${col}`
+            ).textContent = k;
+
+
+            col++;
+
+        }
+
+    }
+
+}
+
+
+/* =========================================================
+   CHECK GUESS
+========================================================= */
+
+function checkGuess(){
+
+    const guess =
+        board[row].join("");
+
+
+    const used =
+        Array(COLS).fill(false);
+
+
+    /* CORRECT LETTERS */
+
+    for(let i=0; i<COLS; i++){
+
+        const tile =
+            document.getElementById(
+                `${row}-${i}`
+            );
+
+
+        tile.classList.add("flip");
+
+
+        if(guess[i] === ANSWER[i]){
+
+            tile.classList.add("correct");
+
+            used[i] = true;
+
+        }
+
+    }
+
+
+    /* PRESENT / ABSENT */
+
+    for(let i=0; i<COLS; i++){
+
+        const tile =
+            document.getElementById(
+                `${row}-${i}`
+            );
+
+
+        if(
+            tile.classList.contains("correct")
+        ){
+            continue;
+        }
+
+
+        for(let j=0; j<COLS; j++){
+
+            if(
+                !used[j] &&
+                guess[i] === ANSWER[j]
+            ){
+
+                tile.classList.add("present");
+
+                used[j] = true;
+
+                break;
+
+            }
+
+        }
+
+
+        if(
+            !tile.classList.contains("present")
+        ){
+
+            tile.classList.add("absent");
+
+        }
+
+    }
+
+
+    /* SUCCESS */
+
+    if(guess === ANSWER){
+
+        setTimeout(() => {
+
+            document.getElementById("game")
+                .style.display = "none";
+
+            document.getElementById("proposal")
+                .style.display = "flex";
+
+        },700);
+
+
+        return;
+    }
+
+
+    /* NEXT ROW */
+
+    row++;
+
+    col = 0;
+
+
+    /* FAILED */
+
+    if(row === ROWS){
+
+        setTimeout(
+            () => alert("The word was DATEME."),
+            600
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   NO BUTTON
+========================================================= */
+
+const no =
+    document.getElementById("no");
+
+
+no.addEventListener(
+    "mouseover",
+    moveNo
+);
+
+
+no.addEventListener(
+    "click",
+    moveNo
+);
+
+
+function moveNo(){
+
+    const x =
+        Math.random() * 220 - 110;
+
+    const y =
+        Math.random() * 120 - 60;
+
+
+    no.style.transform =
+        `translate(${x}px,${y}px`;
+
+}
+
+
+/* =========================================================
+   YES BUTTON
+========================================================= */
+
+document.getElementById("yes").onclick = () => {
+
+    document.getElementById("accepted")
+        .style.display = "block";
+
+};
+
+</script>
+
+</body>
+</html>
+```
